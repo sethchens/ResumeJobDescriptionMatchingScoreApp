@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "648552411550",
+    "project_id": "resume-jobrankingapp",
+    "storage_bucket": "resume-jobrankingapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:648552411550:android:b5343576e9f99491e9668f",
+        "android_client_info": {
+          "package_name": "com.example.todolistapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBg_dchV-skLKByqTCagnwIlERk-_mvtA8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
