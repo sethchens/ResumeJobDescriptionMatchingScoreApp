@@ -1,4 +1,4 @@
-import com.android.build.api.dsl.AaptOptions
+import com.android.build.api.dsl.AndroidResources
 
 plugins {
     alias(libs.plugins.android.application)
@@ -85,6 +85,12 @@ dependencies {
 
     // Gson converter to parse JSON responses
     implementation (libs.converter.gson)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.navigation.runtime.android)
+    implementation(libs.androidx.navigation.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

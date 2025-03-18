@@ -10,41 +10,49 @@ import com.example.todolistapp.data.RepositoryFlaskAPI
 import com.example.todolistapp.components.MainScreen
 import com.example.todolistapp.viewmodel.MainViewModel
 import com.example.todolistapp.data.RepositoryMainViewModelToFireStore
+import com.example.todolistapp.ui.theme.TodoListAPPTheme
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
-
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            TodoListAPPTheme {
+                // Navigation Controller
+                val navController = rememberNavController()
 
-            // Initiate firebase instance
-            val db = Firebase.firestore
+                // Initiate firebase instance
+                val db = Firebase.firestore
 
-            // initiate FlaskAPI repository
-            val repositoryFlaskAPI = RepositoryFlaskAPI()
+                // initiate FlaskAPI repository
+                val repositoryFlaskAPI = RepositoryFlaskAPI()
 
-            // Other setup to hook up everything
-            val repositoryFirestore = RepositoryMainViewModelToFireStore(db)
+                // Other setup to hook up everything
+                val repositoryFirestore = RepositoryMainViewModelToFireStore(db)
 
-            // MainViewModel instance; the use of factory is so that repo can be passed in
-            val mainViewModel: MainViewModel = ViewModelProvider(
-                this,
-                MainViewModelFactory(repositoryFirestore, repositoryFlaskAPI)
-            )[MainViewModel::class.java]
+                // MainViewModel instance; the use of factory is so that repo can be passed in
+                val mainViewModel: MainViewModel = ViewModelProvider(
+                    this,
+                    MainViewModelFactory(repositoryFirestore, repositoryFlaskAPI)
+                )[MainViewModel::class.java]
 
-            mainViewModel.resumeJob.observe(this) { documents ->
-                if (documents.isEmpty()) {
-                    Log.w("Firestore", "No documents found")
-                } else {
-                    for (document in documents) {
-                        Log.d("Firestore", "Main Activity: ${document.id} => ${document.data}")
+                mainViewModel.resumeJob.observe(this) { documents ->
+                    if (documents.isEmpty()) {
+                        Log.w("Firestore", "No documents found")
+                    } else {
+                        for (document in documents) {
+                            Log.d("Firestore", "Main Activity: ${document.id} => ${document.data}")
+                        }
                     }
                 }
-            }
 
-            MainScreen(mainViewModel) // Pass ViewModel to UI
+                MainScreen(mainViewModel, navController) // Pass mainViewModel and navigation controller to main screen
+            }
         }
     }
 }
