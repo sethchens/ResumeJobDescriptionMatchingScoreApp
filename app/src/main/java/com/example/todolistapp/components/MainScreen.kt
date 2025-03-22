@@ -21,7 +21,7 @@ fun MainScreen(mainViewModel: MainViewModel, navController: NavHostController) {
     Column {
         Spacer(
             modifier = Modifier
-            .height(40.dp))
+            .height(55.dp))
         TabRow(selectedTabIndex = selectedTabIndex) {
             tabs.forEachIndexed { index, title ->
                 Tab(

@@ -8,30 +8,18 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.todolistapp.viewmodel.MainViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.google.firebase.firestore.DocumentSnapshot
-import kotlinx.coroutines.launch
 import java.util.Locale
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 
 @Composable
@@ -40,9 +28,10 @@ fun SpeechToScheduleScreen(navController: NavController) {
     val speechRecognizer = remember { SpeechRecognizer.createSpeechRecognizer(context) }
     val recognizerIntent = remember {
         Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM) // or another model
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.US.toString())
             putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak now...")
+            putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true) // Use on-device recognition
         }
     }
 
@@ -65,12 +54,30 @@ fun SpeechToScheduleScreen(navController: NavController) {
                     val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                     if (!matches.isNullOrEmpty()) {
                         speechText = matches[0] // Capture recognized text
+                        Log.d("TTS", speechText)
                     }
                 }
 
                 override fun onError(error: Int) {
-                    speechText = "Error recognizing speech"
+                    speechText = "Error recognizing speech: $error"
+
+                    // Log error details
+                    Log.e("SpeechRecognizer", "Error code: $error")
+
+                    when (error) {
+                        SpeechRecognizer.ERROR_AUDIO -> Log.e("SpeechRecognizer", "Audio recording error")
+                        SpeechRecognizer.ERROR_CLIENT -> Log.e("SpeechRecognizer", "Client-side error")
+                        SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> Log.e("SpeechRecognizer", "Insufficient permissions")
+                        SpeechRecognizer.ERROR_NETWORK -> Log.e("SpeechRecognizer", "Network error")
+                        SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> Log.e("SpeechRecognizer", "Network timeout")
+                        SpeechRecognizer.ERROR_NO_MATCH -> Log.e("SpeechRecognizer", "No recognition match")
+                        SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> Log.e("SpeechRecognizer", "Recognizer busy")
+                        SpeechRecognizer.ERROR_SERVER -> Log.e("SpeechRecognizer", "Server error")
+                        SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> Log.e("SpeechRecognizer", "No speech input")
+                        else -> Log.e("SpeechRecognizer", "Unknown error")
+                    }
                 }
+
 
                 override fun onReadyForSpeech(params: Bundle?) {}
                 override fun onBeginningOfSpeech() {}
@@ -84,11 +91,27 @@ fun SpeechToScheduleScreen(navController: NavController) {
         }) {
             Text("Start Listening")
         }
+    }
 
-        Spacer(modifier = Modifier.height(16.dp))
+    data class ScheduleDetail(val title: String, val description: String, val dateTime: LocalDateTime)
 
-        Button(onClick = { navController.navigate("home") }) {
-            Text("Back to Home")
+//    fun toSchedule(speech: String) {
+//        // send it to the model(maybe firestore)
+//    }
+
+//    fun getScheduleDetails(): ScheduleDetail {
+//        // Do the call and return scheduleDetails
+//    }
+
+    @Composable
+    fun createSchedule(details: List<ScheduleDetail>) {
+        for (detail in details) {
+            Card {
+                Text(detail.title)
+                Text(detail.description)
+                Text((detail.dateTime).toString())
+            }
         }
     }
+
 }

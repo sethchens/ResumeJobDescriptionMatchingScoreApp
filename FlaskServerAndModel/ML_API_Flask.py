@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_restful import Api, Resource
-from transformers import DistilBertTokenizer, DistilBertModel
+from transformers import DistilBertTokenizer, DistilBertModel, AutoTokenizer, AutoModelForSeq2SeqLM
+from huggingface_hub import notebook_login
 import torch
 import numpy as np
 
@@ -58,7 +59,27 @@ class Similarity_score_endpoint(Resource):
         similarity_score = compute_similarity(resume, job_description)
         return jsonify({'similarity_score': similarity_score})
 
+class Speech_to_schedule_endpoint(Resource):
+    model_test = AutoModelForSeq2SeqLM.from_pretrained('sethchens/t5-speech-to-schedule')
+    tokenizer = AutoTokenizer.from_pretrained('sethchens/t5-speech-to-schedule')
+
+    def post(self):
+        if request.is_json:
+            data = request.get_json()  # Get input data from JSON (resume and job description)
+        else:
+            return jsonify({'error': 'Request must be JSON'}), 400
+
+
 api.add_resource(Similarity_score_endpoint, '/similarity_score')
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    model_test = AutoModelForSeq2SeqLM.from_pretrained('sethchens/t5-speech-to-schedule')
+    tokenizer_test = AutoTokenizer.from_pretrained('sethchens/t5-speech-to-schedule')
+    input_text = "Book a doctor's appointment at 3 PM"
+    inputs = tokenizer_test(input_text, return_tensors="pt")
+    outputs = model_test.generate(inputs.input_ids, max_new_tokens=100) #added max_new_tokens.
+    decoded_text = tokenizer_test.decode(outputs[0], skip_special_tokens=True)
+    print(decoded_text)
+
+    # app.run(debug=True, host='0.0.0.0')
+
