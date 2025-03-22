@@ -1,3 +1,0 @@
-You can find the fine-tuning process code at: https://www.kaggle.com/code/sethchen1123/notebook33f35806e7
-Run model.py to get t5-base folder, then compress and upload it to the input directory of the notebook above.
-Upload data.json on there as well.
