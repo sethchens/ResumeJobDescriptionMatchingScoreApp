@@ -75,11 +75,11 @@ api.add_resource(Similarity_score_endpoint, '/similarity_score')
 if __name__ == '__main__':
     model_test = AutoModelForSeq2SeqLM.from_pretrained('sethchens/t5-speech-to-schedule')
     tokenizer_test = AutoTokenizer.from_pretrained('sethchens/t5-speech-to-schedule')
-    input_text = "Book a doctor's appointment at 3 PM"
+    input_text = "Plan a bird watching trip this Sunday morning at the nature reserve."
     inputs = tokenizer_test(input_text, return_tensors="pt")
     outputs = model_test.generate(inputs.input_ids, max_new_tokens=100) #added max_new_tokens.
     decoded_text = tokenizer_test.decode(outputs[0], skip_special_tokens=True)
-    print(decoded_text)
+    print(outputs)
 
     # app.run(debug=True, host='0.0.0.0')
 

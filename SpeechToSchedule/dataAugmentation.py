@@ -3,10 +3,11 @@ import pandas as pd
 from transformers import pipeline
 
 # First turn the data into dataframe
-with open('dataToAugment.json', 'r') as f:
+with open('raw.json', 'r') as f:
     data = json.load(f)
 
 df = pd.DataFrame(data)
+print(df)
 
 output = df['output'].apply(pd.Series)
 df = pd.concat([df.drop(columns=['output']), output], axis=1)
@@ -19,10 +20,7 @@ def augment_dataset(generator, data, num_variations=5):
     augmented_data = []
     
     for sample in data:
-        prompt = f"""Rephrase the following sentence in different ways while keeping the meaning intact:
-        "{sample['input']}"
-        
-        Generate {num_variations} variations:"""
+        prompt = sample["input"] # Access the input string.
 
         generated_variations = generator(prompt, max_length=100, truncation=True, num_return_sequences=num_variations, num_beams=5)
 
